@@ -1,15 +1,17 @@
 package com.jianhao.nacos_server.controller;
 
-import javax.validation.constraints.Pattern;
 
+import javax.validation.Valid;
+import com.jianhao.nacos_server.enity.Result;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.jianhao.nacos_server.enity.Config;
 
-import org.hibernate.validator.constraints.pl.PESEL;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("config")
 @Api(tags = "nacos配置中心接口类")
+@Validated
 public class configController {
 
     @NacosInjected
@@ -26,17 +29,20 @@ public class configController {
 
     @ApiOperation(value = "获取配置", notes = "根据dataId、group获取一份配置")
     @GetMapping("getConfig")
-    public String getConfig(String dataId, String group) {
+    public Result<String> getConfig(@RequestBody @Valid Config config) {
+        Result<String> result = new Result<String>();
         try {
-            String configInfo = configService.getConfig(dataId, group, 3000);
+            String configInfo = configService.getConfig(config.getDataId(), config.getGroup(), 3000);
             System.out.println(configInfo);
             if (configInfo == null) {
-                return "找不到该配置！";
+                result.setCode(400).setMsg("查找不到该配置，请检查你的参数！");
+                return result;
             }
-            return configInfo;
+            result.setData(configInfo).setCode(200).setMsg("查找成功！");
+            return result;
         } catch (NacosException e) {
             e.printStackTrace();
-            return "fail";
+            return result.setCode(500).setMsg("发生NacosExecption异常，请联系管理员！");
         }
     }
 
