@@ -73,6 +73,13 @@
 			<version>1.1.1</version>
 		</dependency>
 
+		<!-- 引入数据校验 -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.1.7.Final</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
