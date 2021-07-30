@@ -1,8 +1,8 @@
 package com.jianhao.nacos_server.controller;
 
 
-import javax.validation.Valid;
 import com.jianhao.nacos_server.enity.Result;
+import com.jianhao.nacos_server.exception.MyException;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
@@ -10,6 +10,7 @@ import com.jianhao.nacos_server.enity.Config;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +29,11 @@ public class configController {
     private ConfigService configService;
 
     @ApiOperation(value = "获取配置", notes = "根据dataId、group获取一份配置")
-    @GetMapping("getConfig")
-    public Result<String> getConfig(@RequestBody @Valid Config config) {
+    @PostMapping("getConfig")
+    public Result<String> getConfig(@RequestBody @Validated Config config) {
+        
         Result<String> result = new Result<String>();
+        System.out.println("config对象---->"+config);
         try {
             String configInfo = configService.getConfig(config.getDataId(), config.getGroup(), 3000);
             System.out.println(configInfo);
@@ -65,5 +68,16 @@ public class configController {
             e.printStackTrace();
             return "fail";
         }
+    }
+
+
+
+    @GetMapping("test")
+    public void test(){
+        throw new MyException();
+    }
+    @GetMapping("test1")
+    public void test1() throws Exception {
+        throw new Exception("throw Exception!!!");
     }
 }
