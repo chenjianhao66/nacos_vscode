@@ -35,4 +35,6 @@ public class Config {
 
     @NotNull(message = "type不能为空，默认为properties")
     private String type;
+
+    private String[] content;
 }

@@ -10,15 +10,19 @@ import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
+import com.alibaba.nacos.api.naming.pojo.Service;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
+@Api(tags = "NACOS服务发现接口测试")
 public class NamingController {
 
 
@@ -30,7 +34,14 @@ public class NamingController {
     private ConfigService configService;
     
 
-    @ApiOperation("增加服务")
+    /**
+     * 
+     * 根据serviceName添加一个空服务
+     * @param serviceName
+     * @param groupName
+     * @return
+     */
+    @ApiOperation(value = "增加服务",notes = "根据输入的serviceName添加一个空服务")
     @PostMapping("addService")
     public String addService(String serviceName,String groupName){
         RestTemplate restTemplate = new RestTemplate();
@@ -42,19 +53,38 @@ public class NamingController {
         return result;
     }
     
+
+    /**
+     * 获取输入服务的所有实例
+     * @param serviceName
+     * @return List<Instance> 该服务下的实例集合
+     * @throws NacosException
+     */
     @ApiOperation("获取一个服务下的所有实例")
     @GetMapping("getAllInstancse")
+    @ResponseBody
     public List<Instance> getAllInstancse(String serviceName)throws NacosException{
          return namingService.getAllInstances(serviceName);
     }
 
 
 
+    /**
+     * 根据IP地址、端口号、服务名、分组来注册一个实例
+     * @param ip
+     * @param port
+     * @param serviceName
+     * @param groupName
+     * @return
+     */
     @ApiOperation("注册实例")
     @PostMapping("registerInster")
     public String registerInster(String ip,int port,String serviceName,String groupName){
         try {
+            Service service  = new Service();
+            Instance instance = new Instance();
             NamingService server = NacosFactory.createNamingService("localhost");
+            
             server.registerInstance(serviceName, groupName, ip, port);
         } catch (NacosException e) {
             return "注册失败！";
